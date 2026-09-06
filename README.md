@@ -1,47 +1,50 @@
----
-
-### 3. Bike Demand Analysis (`Baik-Demand-Dataset-Analysis`)
-
-```markdown
 # Daily Bike Demand Time-Series Regression
 
-**Time-Series Regression · Demand Forecasting**
-
-Predicting aggregate daily shared bike rental demand using calendar schedules and observed meteorological conditions evaluated on a strict chronological split.
+Predicting aggregate daily shared bike rental demand from calendar and meteorological features using chronological validation.
 
 ---
 
 ## Overview
 
-* **Objective:** Forecast daily rental demand (`cnt`) conditionally using calendar flags and weather features.
-* **Dataset:** 731 daily records (UCI Bike Sharing Dataset).
-* **Selected Model:** **Ridge Regression** (Holdout $RMSE = 1165.65$, $R^2 = 0.6134$).
-* **Top Feature:** Feeling temperature (`atemp`) yielded the highest permutation importance drop (326.69).
+* **Task:** Retrospective conditional demand regression on the UCI Bike Sharing dataset.
+* **Selected Model:** Ridge Regression ($RMSE = 1165.65$, $R^2 = 0.6134$).
+* **Baseline:** Dummy Baseline ($RMSE = 2560.56$, $R^2 = -0.8657$).
+* **Primary Predictor:** Feeling temperature (`atemp`) yielded the highest permutation importance drop (326.69).
 
 ---
 
-## Evaluation Design & Results
+## Evaluation & Results
 
-* **Split Strategy:** Expanding-window CV with a 7-row gap; final chronological holdout of 147 days.
-* **Leakage Guard:** `casual` and `registered` columns strictly excluded (direct sums of target).
+Evaluation uses expanding-window cross-validation with a 7-row gap on 584 training records, followed by a final chronological holdout of 147 rows. Direct target components (`casual`, `registered`) were excluded to prevent target leakage.
 
 ### Final Chronological Holdout
 
-| Model | RMSE | MAE | $R^2$ |
-| :--- | :--- | :--- | :--- |
-| **Ridge Regression** | **1165.65** | **870.67** | **0.6134** |
-| Random Forest (CV Candidate) | 1465.81 | — | — |
-| Dummy Baseline | 2560.56 | 2290.41 | -0.8657 |
+| Model | Metric | Value |
+| :--- | :--- | :--- |
+| **Ridge Regression** | **RMSE** | **1165.65** |
+| Ridge Regression | MAE | 870.67 |
+| Ridge Regression | $R^2$ | 0.6134 |
+| Dummy Baseline | RMSE | 2560.56 |
+| Dummy Baseline | MAE | 2290.41 |
+| Dummy Baseline | $R^2$ | -0.8657 |
+
+---
+
+## Data Summary
+
+* **Source:** [UCI Bike Sharing Dataset](https://archive.ics.uci.edu/dataset/275/bike+sharing+dataset) (CC BY 4.0)
+* **Quality:** 731 rows, 0 missing cells, 0 duplicates removed.
+* **Collinearity:** Strong correlation observed between `temp` and `atemp` ($\vert{}r\vert{} = 0.997$).
 
 ---
 
 ## Visualizations
 
-| Feature Distributions | Model CV Comparison |
+| Demand Distributions | CV Model Comparison |
 | :---: | :---: |
 | ![Distributions](figures/distributions.png) | ![Model Comparison](figures/model-comparison.png) |
 
-| Chronological Demand Forecast | Permutation Importance |
+| Chronological Predictions | Permutation Importance |
 | :---: | :---: |
 | ![Time Series](figures/time-series.png) | ![Feature Importance](figures/feature-importance.png) |
 
@@ -50,12 +53,12 @@ Predicting aggregate daily shared bike rental demand using calendar schedules an
 ## Repository Structure
 
 ```text
-├── figures/                   # Chronological tracking, residuals, and importance plots
-├── analysis.ipynb             # Notebook detailing chronological cross-validation
-├── audit.json                 # Data integrity record and configuration run trace
-├── data_dictionary.csv        # Column dictionary and temporal coverage details
-├── descriptive_statistics.csv # Parametric and non-parametric distribution metrics
-├── error_analysis.csv         # Chronological residual analysis and max error points
-├── feature_importance.csv     # Permutation score drops across candidate predictors
-├── metrics.json               # Final validation and holdout performance values
+├── figures/                 # Diagnostic, time-series, and residual plots
+├── analysis.ipynb           # Interactive workflow and cross-validation walkthrough
+├── audit.json               # Environment hashes and pipeline reproducibility data
+├── data_dictionary.csv      # Column schemas and data types
+├── descriptive_statistics.csv # Parametric summary stats
+├── error_analysis.csv       # Holdout residuals and largest error logs
+├── feature_importance.csv   # Model-level permutation importance scores
+├── metrics.json             # CV and final holdout scores
 └── README.md
