@@ -1,0 +1,17 @@
+column,dtype,missing,unique,role
+instant,int64,0,731,excluded
+dteday,datetime64[ns],0,731,excluded
+season,int64,0,4,feature
+yr,int64,0,2,feature
+mnth,int64,0,12,feature
+holiday,int64,0,2,feature
+weekday,int64,0,7,feature
+workingday,int64,0,2,feature
+weathersit,int64,0,3,feature
+temp,float64,0,499,feature
+atemp,float64,0,690,feature
+hum,float64,0,595,feature
+windspeed,float64,0,650,feature
+casual,int64,0,606,excluded
+registered,int64,0,679,excluded
+cnt,int64,0,696,target
