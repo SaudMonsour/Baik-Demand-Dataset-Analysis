@@ -1,51 +1,64 @@
-# تقدير الطلب اليومي على الدراجات
+# Daily Bike Demand Time-Series Regression
 
-دراسة انحدار للطلب اليومي على تأجير الدراجات باستخدام المتغيرات التقويمية والطقس المرصود، على 731 يومًا من بيانات UCI.
+Predicting aggregate daily shared bike rental demand from calendar and meteorological features using chronological validation.
 
-جرى التقييم زمنيًا: 584 سجلًا للتدريب و147 سجلًا لاحقًا للاختبار، مع تحقق متقاطع بنافذة تدريب متسعة وفاصل سبعة صفوف. استُبعدت المتغيرات المكوّنة مباشرةً للهدف لمنع التسرب.
+---
 
-تفوق انحدار ريدج على خط الأساس في الاختبار. كانت الحرارة المحسوسة من أكثر المدخلات تأثيرًا في تبديل الخصائص، وبلغ ارتباط الحرارة والحرارة المحسوسة 0.997.
+## Overview
 
-هذه تقديرات مشروطة بطقس مرصود، وليست توقعات مستقبلية تملك معلومات الطقس مسبقًا. تُعرض الدرجات بدقة النسخة الأصلية في الجداول.
+* **Task:** Retrospective conditional demand regression on the UCI Bike Sharing dataset.
+* **Selected Model:** Ridge Regression ($RMSE = 1165.65$, $R^2 = 0.6134$).
+* **Baseline:** Dummy Baseline ($RMSE = 2560.56$, $R^2 = -0.8657$).
+* **Primary Predictor:** Feeling temperature (`atemp`) yielded the highest permutation importance drop (326.69).
 
-## النتائج المسجّلة
+---
 
-الأرقام التالية من التنفيذ المحفوظ لهذه النسخة؛ لم تُعَد التجارب أثناء تعريب التوثيق.
+## Evaluation & Results
 
-### الاختبار الزمني المحفوظ
+Evaluation uses expanding-window cross-validation with a 7-row gap on 584 training records, followed by a final chronological holdout of 147 rows. Direct target components (`casual`, `registered`) were excluded to prevent target leakage.
 
-| النموذج | المقياس | القيمة |
+### Final Chronological Holdout
+
+| Model | Metric | Value |
 | :--- | :--- | :--- |
-| **انحدار ريدج** | **RMSE** | **1165.65** |
-| انحدار ريدج | MAE | 870.67 |
-| انحدار ريدج | $R^2$ | 0.6134 |
-| خط الأساس البسيط | RMSE | 2560.56 |
-| خط الأساس البسيط | MAE | 2290.41 |
-| خط الأساس البسيط | $R^2$ | -0.8657 |
+| **Ridge Regression** | **RMSE** | **1165.65** |
+| Ridge Regression | MAE | 870.67 |
+| Ridge Regression | $R^2$ | 0.6134 |
+| Dummy Baseline | RMSE | 2560.56 |
+| Dummy Baseline | MAE | 2290.41 |
+| Dummy Baseline | $R^2$ | -0.8657 |
 
-## الرسوم والنتائج المرئية
+---
 
-![رسم 1: توزيع القيم](figures/distributions.png)
+## Data Summary
 
-![رسم 2: مقارنة النماذج](figures/model-comparison.png)
+* **Source:** [UCI Bike Sharing Dataset](https://archive.ics.uci.edu/dataset/275/bike+sharing+dataset) (CC BY 4.0)
+* **Quality:** 731 rows, 0 missing cells, 0 duplicates removed.
+* **Collinearity:** Strong correlation observed between `temp` and `atemp` ($\vert{}r\vert{} = 0.997$).
 
-![رسم 3: التوقعات عبر الزمن](figures/time-series.png)
+---
 
-![رسم 4: أهمية الخصائص](figures/feature-importance.png)
+## Visualizations
 
-الرسوم محفوظة من التنفيذ الأصلي. تعريب هذه الصفحة لا يغيّر بياناتها أو تسميات الصور داخل الملفات.
+| Demand Distributions | CV Model Comparison |
+| :---: | :---: |
+| ![Distributions](figures/distributions.png) | ![Model Comparison](figures/model-comparison.png) |
 
-## الملفات المرجعية
+| Chronological Predictions | Permutation Importance |
+| :---: | :---: |
+| ![Time Series](figures/time-series.png) | ![Feature Importance](figures/feature-importance.png) |
 
-- [مقاييس التقييم والنتائج](metrics.json).
-- [بيانات التدقيق وبيئة التنفيذ](audit.json).
-- [مصدر البيانات وشروط الترخيص](SOURCE.md).
-- [سجل أخطاء الاختبار](error_analysis.csv).
-- [دفتر شرح التحليل](analysis.ipynb).
-- [ملاحظات المراجعة البشرية](LEARNING_NOTES.md).
+---
 
-## المصادر والإسناد
+## Repository Structure
 
-- [مصدر 1: UCI Bike Sharing Dataset](https://archive.ics.uci.edu/dataset/275/bike+sharing+dataset).
-
-[المرجع التقني الإنجليزي الكامل](README.en.md) يحفظ تفاصيل النسخة الأصلية. تُترك أسماء الملفات والأوامر ومعرّفات النماذج والمقاييس بصيغتها التقنية لضمان تطابقها مع الكود.
+```text
+├── figures/                 # Diagnostic, time-series, and residual plots
+├── analysis.ipynb           # Interactive workflow and cross-validation walkthrough
+├── audit.json               # Environment hashes and pipeline reproducibility data
+├── data_dictionary.csv      # Column schemas and data types
+├── descriptive_statistics.csv # Parametric summary stats
+├── error_analysis.csv       # Holdout residuals and largest error logs
+├── feature_importance.csv   # Model-level permutation importance scores
+├── metrics.json             # CV and final holdout scores
+└── README.md
